@@ -16,29 +16,32 @@ export const myARToolkit = ({
   markerPatternURL,
   scene,
 }: ARToolkitInitOptions) => {
+  /*描画の設定 */
   const arToolkitSource = new THREEx.ArToolkitSource({
     sourceType: "webcam",
     sourceWidth: window.innerWidth > window.innerHeight ? 640 : 480,
     sourceHeight: window.innerWidth > window.innerHeight ? 480 : 640,
   });
-
+  /*カメラ側の設定 */
   const arToolkitContext = new THREEx.ArToolkitContext({
-    cameraParametersUrl: cameraParaDatURL,
+    cameraParametersUrl: cameraParaDatURL /*カメラキャリブレーション等の設定 */,
     detectionMode: "mono",
   });
-
-  const arMarkerControls = new THREEx.ArMarkerControls(
+  /*パターン画像に関する設定 */
+  const arMarkerControls = new THREEx.ArMarkerControls( //一つのマーカーに対応
     arToolkitContext,
-    camera,
+    camera, //マーカー発見時カメラに合わせて回転や移動するオブジェクト||複数マーカーつかう際はmodelViewMatrix
     {
       type: "pattern",
       patternUrl: markerPatternURL,
-      changeMatrixMode: "cameraTransformMatrix",
+      changeMatrixMode: "cameraTransformMatrix", //
     }
   );
-
+  /*描画の設定 */
   arToolkitSource.init(
+    //画像ソース準備後3DObj_canvasとカメラ映像を画面いっぱいにリサイズ
     () => {
+      //onReady
       arToolkitSource.domElement.addEventListener("canplay", () => {
         initARContext();
       });
@@ -47,7 +50,9 @@ export const myARToolkit = ({
         onResize();
       }, 2000);
     },
-    () => {}
+    () => {
+      /*onError */
+    }
   );
 
   window.addEventListener("resize", function () {
@@ -65,13 +70,16 @@ export const myARToolkit = ({
   }
 
   function initARContext() {
+    //カメラ側の設定？検出方法や、投影方法か 直訳:投影行列をカメラにコピー
     arToolkitContext.init(() => {
-      camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
+      /*3Dオブジェクトで投影する映像 */
+      camera.projectionMatrix.copy(
+        arToolkitContext.getProjectionMatrix() /*現実のカメラ映像 */
+      );
 
       arToolkitContext.arController.orientatio = getSourceOrientation();
       arToolkitContext.arController.options.orientation =
         getSourceOrientation();
-
       window.arToolkitContext = arToolkitContext;
     });
 
@@ -79,7 +87,6 @@ export const myARToolkit = ({
 
     window.arMarkerControls = arMarkerControls;
   }
-
   function getSourceOrientation(): string {
     return arToolkitSource.domElement.videoWidth >
       arToolkitSource.domElement.videoHeight
@@ -88,6 +95,7 @@ export const myARToolkit = ({
   }
 
   return {
+    /**設定を返す */
     arToolkitSource,
     arToolkitContext,
     arMarkerControls,
