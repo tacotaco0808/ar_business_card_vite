@@ -17,7 +17,7 @@ export const main = () => {
   renderer.domElement.style.top = "0px";
   renderer.domElement.style.left = "0px";
   document.body.appendChild(renderer.domElement);
-
+  //
   /*シーンとマテリアル */
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(60, 640 / 480, 0.01, 20);
